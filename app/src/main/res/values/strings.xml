@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">HseProject</string>
+    <string name="read_news">Read news</string>
+    <string name="open_stats">Open stats</string>
+    <string name="right">You are right :)</string>
+    <string name="wrong">You are wrong :(</string>
+</resources>
