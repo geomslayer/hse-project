@@ -19,6 +19,11 @@
             android:parentActivityName=".MainActivity">
 
         </activity>
+
+        <provider
+            android:name=".data.NewsProvider"
+            android:authorities="com.example.geomslayer.hseproject.data"
+            android:exported="false" />
     </application>
 
 </manifest>
