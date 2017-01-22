@@ -30,6 +30,7 @@ public class NewsProvider extends ContentProvider {
     private final int FULL_NEWS = 201;
     private final int NEWS_ID = 202;
     private final int FULL_NEWS_ID = 203;
+    private final int NEWS = 204;
 
     private final int OPTIONS = 300;
     private final int OPTIONS_ID = 301;
@@ -39,6 +40,7 @@ public class NewsProvider extends ContentProvider {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, TopicEntry.TABLE_NAME, TOPICS);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, TopicEntry.TABLE_NAME + "/#", TOPICS_ID);
+        matcher.addURI(NewsContract.CONTENT_AUTHORITY, NewsEntry.TABLE_NAME, NEWS);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY,
                 NewsEntry.TABLE_NAME + "/" + NewsEntry.PATH_SIMPLE, SIMPLE_NEWS);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY,
@@ -156,7 +158,7 @@ public class NewsProvider extends ContentProvider {
                 }
                 break;
 
-            case SIMPLE_NEWS:
+            case NEWS:
                 id = db.insert(NewsEntry.TABLE_NAME, null, contentValues);
                 if (id > 0) {
                     retUri = NewsEntry.buildSimpleNewsUri(id);
@@ -191,7 +193,7 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(TopicEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
-            case SIMPLE_NEWS:
+            case NEWS:
                 rowsDeleted = db.delete(NewsEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
@@ -218,7 +220,7 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(TopicEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
-            case SIMPLE_NEWS:
+            case NEWS:
                 rowsUpdated = db.update(NewsEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
