@@ -1,13 +1,18 @@
 package com.example.geomslayer.hseproject;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
+import com.example.geomslayer.hseproject.data.NewsContract.TopicEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,21 +29,20 @@ public class ReadActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
 
+        Uri newsEntryUri = getIntent().getData();
+        Cursor cursor = getContentResolver().query(newsEntryUri, null, null, null, null);
+        cursor.moveToNext();
+
         news = new Entry(
-                "Определен самый мощный современный смартфон",
-                "10 января, 21:18",
-                "Наука и техника",
-                "Флагман iPhone 7 Plus занял первое место в рейтинге самых производительных смартфонов 2016 года по версии создателей популярной программы-бенчмарка AnTuTu. В тестах гаджет набрал более 180.000 баллов.\n" +
-                        "\n" +
-                        "На втором месте оказался еще один продукт Apple – iPhone 7 (172.000 баллов). В тройку лучших смартфонов также попал китайский OnePlus 3T (163.000 баллов).\n" +
-                        "\n" +
-                        "Кроме того, в десятке самых производительных мобильных устройств оказались OnePlus3, Xiaomi Mi 5s, Moto Z, LeEco Le Pro3, ZTE AXON 7 и Asus Zenfone.\n" +
-                        "\n" +
-                        "AnTuTu является одним из лидирующих тестов для определения производительности мобильных устройств. На сегодняшний день программу использует более 100 миллионов пользователей по всему миру."
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_TITLE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_DATE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(TopicEntry.COLUMN_BODY)),
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_CONTENT))
         );
+
         question = new Question(
-                "Какой по мнению экспертов смартфон является самым мощным в 2016?",
-                new ArrayList<>(Arrays.asList("Xiaomi Mi5s Plus", "iPhone 7 Plus", "OnePlus 3T", "AnTuTu")),
+                cursor.getString(cursor.getColumnIndex(NewsEntry.COLUMN_QUESTION)),
+                new ArrayList<>(Arrays.asList("Вариант 1", "Вариант 2", "Вариант 3")),
                 1
         );
 
@@ -81,9 +85,11 @@ public class ReadActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         int tag = (int) view.getTag();
         if (question.checkAnswer(tag)) {
-            Toast.makeText(this, getString(R.string.right), Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, getString(R.string.right), Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.activity_read), R.string.right, Snackbar.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, getString(R.string.wrong), Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, getString(R.string.wrong), Toast.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.activity_read), R.string.wrong, Snackbar.LENGTH_SHORT).show();
         }
     }
 }

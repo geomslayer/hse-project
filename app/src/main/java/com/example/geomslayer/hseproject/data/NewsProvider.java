@@ -20,13 +20,17 @@ import com.example.geomslayer.hseproject.data.NewsContract.TopicEntry;
 
 public class NewsProvider extends ContentProvider {
 
+    private static final String TAG = "NewsProvider";
+
     private final UriMatcher matcher = buildMatcher();
     private NewsDbHelper openHelper;
 
     private final int TOPICS = 100;
     private final int TOPICS_ID = 101;
-    private final int NEWS = 200;
-    private final int NEWS_ID = 201;
+    private final int SIMPLE_NEWS = 200;
+    private final int FULL_NEWS = 201;
+    private final int NEWS_ID = 202;
+    private final int FULL_NEWS_ID = 203;
     private final int OPTIONS = 300;
     private final int OPTIONS_ID = 301;
 
@@ -34,8 +38,14 @@ public class NewsProvider extends ContentProvider {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, TopicEntry.TABLE_NAME, TOPICS);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, TopicEntry.TABLE_NAME + "/#", TOPICS_ID);
-        matcher.addURI(NewsContract.CONTENT_AUTHORITY, NewsEntry.TABLE_NAME, NEWS);
-        matcher.addURI(NewsContract.CONTENT_AUTHORITY, NewsEntry.TABLE_NAME + "/#", NEWS_ID);
+        matcher.addURI(NewsContract.CONTENT_AUTHORITY,
+                NewsEntry.TABLE_NAME + "/" + NewsEntry.PATH_SIMPLE, SIMPLE_NEWS);
+        matcher.addURI(NewsContract.CONTENT_AUTHORITY,
+                NewsEntry.TABLE_NAME + "/" + NewsEntry.PATH_FULL, FULL_NEWS);
+        matcher.addURI(NewsContract.CONTENT_AUTHORITY,
+                NewsEntry.TABLE_NAME + "/" + NewsEntry.PATH_SIMPLE + "/#", NEWS_ID);
+        matcher.addURI(NewsContract.CONTENT_AUTHORITY,
+                NewsEntry.TABLE_NAME + "/" + NewsEntry.PATH_FULL + "/#", FULL_NEWS_ID);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, OptionEntry.TABLE_NAME, OPTIONS);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, OptionEntry.TABLE_NAME + "/#", OPTIONS_ID);
         return matcher;
@@ -53,6 +63,12 @@ public class NewsProvider extends ContentProvider {
         final SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         final int match = matcher.match(uri);
         long id;
+
+        final String SQL_JOIN = NewsEntry.TABLE_NAME + " INNER JOIN " +
+                TopicEntry.TABLE_NAME + " ON " +
+                TopicEntry.TABLE_NAME + "." + TopicEntry._ID + " = " +
+                NewsEntry.TABLE_NAME + "." + NewsEntry.COLUMN_TOPIC_ID;
+
         switch (match) {
             case TOPICS:
                 queryBuilder.setTables(TopicEntry.TABLE_NAME);
@@ -61,17 +77,27 @@ public class NewsProvider extends ContentProvider {
             case TOPICS_ID:
                 queryBuilder.setTables(TopicEntry.TABLE_NAME);
                 id = TopicEntry.getIdFromUri(uri);
-                queryBuilder.appendWhere(TopicEntry._ID + " = " + id);
+                queryBuilder.appendWhere(TopicEntry.TABLE_NAME + "." + TopicEntry._ID + " = " + id);
                 break;
 
-            case NEWS:
+            case SIMPLE_NEWS:
                 queryBuilder.setTables(NewsEntry.TABLE_NAME);
+                break;
+
+            case FULL_NEWS:
+                queryBuilder.setTables(SQL_JOIN);
                 break;
 
             case NEWS_ID:
                 queryBuilder.setTables(NewsEntry.TABLE_NAME);
                 id = NewsEntry.getIdFromUri(uri);
                 queryBuilder.appendWhere(NewsEntry._ID + " = " + id);
+                break;
+
+            case FULL_NEWS_ID:
+                queryBuilder.setTables(SQL_JOIN);
+                id = NewsEntry.getIdFromUri(uri);
+                queryBuilder.appendWhere(NewsEntry.TABLE_NAME + "." + NewsEntry._ID + " = " + id);
                 break;
 
             case OPTIONS:
@@ -81,7 +107,7 @@ public class NewsProvider extends ContentProvider {
             case OPTIONS_ID:
                 queryBuilder.setTables(OptionEntry.TABLE_NAME);
                 id = OptionEntry.getIdFromUri(uri);
-                queryBuilder.appendWhere(OptionEntry._ID + " = " + id);
+                queryBuilder.appendWhere(OptionEntry.TABLE_NAME + "." + OptionEntry._ID + " = " + id);
                 break;
 
             default:
@@ -121,10 +147,10 @@ public class NewsProvider extends ContentProvider {
                 }
                 break;
 
-            case NEWS:
+            case SIMPLE_NEWS:
                 id = db.insert(NewsEntry.TABLE_NAME, null, contentValues);
                 if (id > 0) {
-                    retUri = NewsEntry.buildNewsUri(id);
+                    retUri = NewsEntry.buildSimpleNewsUri(id);
                 } else {
                     throw new SQLException("Failed to insert row into " + NewsEntry.TABLE_NAME);
                 }
@@ -156,7 +182,7 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(TopicEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
-            case NEWS:
+            case SIMPLE_NEWS:
                 rowsDeleted = db.delete(NewsEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
@@ -183,7 +209,7 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(TopicEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
-            case NEWS:
+            case SIMPLE_NEWS:
                 rowsUpdated = db.update(NewsEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 

@@ -17,6 +17,9 @@ public class NewsContract {
      */
     public static class NewsEntry implements BaseColumns {
         public static final String TABLE_NAME = "news";
+        public static final String PATH_SIMPLE = "simple";
+        public static final String PATH_FULL = "full";
+
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
@@ -31,8 +34,20 @@ public class NewsContract {
         // The text of related question
         public static final String COLUMN_QUESTION = "question";
 
-        public static Uri buildNewsUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildSimpleNewsUri() {
+            return CONTENT_URI.buildUpon().appendPath(PATH_SIMPLE).build();
+        }
+
+        public static Uri buildSimpleNewsUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(PATH_SIMPLE).appendPath(String.valueOf(id)).build();
+        }
+
+        public static Uri buildFullNewsUri(long id) {
+            return CONTENT_URI.buildUpon().appendPath(PATH_FULL).appendPath(String.valueOf(id)).build();
+        }
+
+        public static Uri buildFullNewsUri() {
+            return CONTENT_URI.buildUpon().appendPath(PATH_FULL).build();
         }
 
         public static long getIdFromUri(Uri uri) {
