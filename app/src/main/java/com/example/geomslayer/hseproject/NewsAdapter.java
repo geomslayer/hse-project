@@ -58,5 +58,4 @@ class NewsAdapter extends CursorAdapter {
         }
     }
 
-
 }

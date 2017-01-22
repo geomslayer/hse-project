@@ -3,21 +3,50 @@ package com.example.geomslayer.hseproject;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.view.MenuItemCompat;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.example.geomslayer.hseproject.data.NewsContract;
 import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener {
 
     private static final String TAG = "MainActivity";
 
     @Override
+    int getLayoutResource() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        MenuItem spinnerItem = menu.findItem(R.id.action_topic);
+
+        Spinner spinnerTopics = (Spinner) MenuItemCompat.getActionView(spinnerItem);
+        Cursor topicsCursor = getContentResolver().query(NewsContract.TopicEntry.CONTENT_URI, null, null, null, null);
+        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(
+                this, android.R.layout.simple_spinner_item, topicsCursor,
+                new String[]{NewsContract.TopicEntry.COLUMN_BODY},
+                new int[]{android.R.id.text1}, 0);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTopics.setAdapter(spinnerAdapter);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
 //        getContentResolver().delete(NewsEntry.CONTENT_URI, null, null);
 //
@@ -43,6 +72,45 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        values.put(NewsEntry.COLUMN_TOPIC_ID, 1);
 //        getContentResolver().insert(NewsEntry.CONTENT_URI, values);
 
+//        getContentResolver().delete(OptionEntry.CONTENT_URI, null, null);
+//
+//        ContentValues values = new ContentValues();
+//        values.put(OptionEntry.COLUMN_BODY, "Черная ягода");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 0);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 97);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+//
+//        values.put(OptionEntry.COLUMN_BODY, "Канадская кампания");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 1);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 97);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+//
+//        values.put(OptionEntry.COLUMN_BODY, "Нет");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 0);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 98);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+//
+//        values.put(OptionEntry.COLUMN_BODY, "Да");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 1);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 98);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+//
+//        values.put(OptionEntry.COLUMN_BODY, "Что это?");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 0);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 98);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+//
+//        values.put(OptionEntry.COLUMN_BODY, "14 650 рублей");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 1);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 99);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+//
+//        values.put(OptionEntry.COLUMN_BODY, "1699 юаней");
+//        values.put(OptionEntry.COLUMN_IS_ANSWER, 1);
+//        values.put(OptionEntry.COLUMN_NEWS_ID, 99);
+//        getContentResolver().insert(OptionEntry.CONTENT_URI, values);
+
+
         Cursor cursor = getContentResolver().query(
                 NewsEntry.buildSimpleNewsUri(), null, null, null, null);
 
@@ -55,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent readIntent = new Intent(this, ReadActivity.class);
-        readIntent.setData(NewsEntry.buildFullNewsUri(id));
+        readIntent.putExtra(NewsEntry._ID, id);
         startActivity(readIntent);
     }
 }

@@ -4,4 +4,6 @@
     <string name="open_stats">Open stats</string>
     <string name="right">You are right :)</string>
     <string name="wrong">You are wrong :(</string>
+    <string name="settings">Settings</string>
+    <string name="back">back</string>
 </resources>

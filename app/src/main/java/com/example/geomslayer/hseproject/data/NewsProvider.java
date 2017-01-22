@@ -10,9 +10,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
-import com.example.geomslayer.hseproject.data.NewsContract.OptionEntry;
-import com.example.geomslayer.hseproject.data.NewsContract.TopicEntry;
+import com.example.geomslayer.hseproject.data.NewsContract.*;
 
 /**
  * Created by geomslayer on 21.01.17.
@@ -27,12 +25,15 @@ public class NewsProvider extends ContentProvider {
 
     private final int TOPICS = 100;
     private final int TOPICS_ID = 101;
+
     private final int SIMPLE_NEWS = 200;
     private final int FULL_NEWS = 201;
     private final int NEWS_ID = 202;
     private final int FULL_NEWS_ID = 203;
+
     private final int OPTIONS = 300;
     private final int OPTIONS_ID = 301;
+    private final int OPTIONS_WITH_NEWS_ID = 302;
 
     private UriMatcher buildMatcher() {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -48,6 +49,8 @@ public class NewsProvider extends ContentProvider {
                 NewsEntry.TABLE_NAME + "/" + NewsEntry.PATH_FULL + "/#", FULL_NEWS_ID);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, OptionEntry.TABLE_NAME, OPTIONS);
         matcher.addURI(NewsContract.CONTENT_AUTHORITY, OptionEntry.TABLE_NAME + "/#", OPTIONS_ID);
+        matcher.addURI(NewsContract.CONTENT_AUTHORITY,
+                OptionEntry.TABLE_NAME + "/" + OptionEntry.PATH_WITH_NEWS + "/#", OPTIONS_WITH_NEWS_ID);
         return matcher;
     }
 
@@ -108,6 +111,12 @@ public class NewsProvider extends ContentProvider {
                 queryBuilder.setTables(OptionEntry.TABLE_NAME);
                 id = OptionEntry.getIdFromUri(uri);
                 queryBuilder.appendWhere(OptionEntry.TABLE_NAME + "." + OptionEntry._ID + " = " + id);
+
+            case OPTIONS_WITH_NEWS_ID:
+                queryBuilder.setTables(OptionEntry.TABLE_NAME);
+                id = OptionEntry.getIdFromUri(uri);
+                queryBuilder.appendWhere(
+                        OptionEntry.TABLE_NAME + "." + OptionEntry.COLUMN_NEWS_ID + " = " + id);
                 break;
 
             default:
@@ -141,7 +150,7 @@ public class NewsProvider extends ContentProvider {
             case TOPICS:
                 id = db.insert(TopicEntry.TABLE_NAME, null, contentValues);
                 if (id > 0) {
-                    retUri = TopicEntry.buildNewsUri(id);
+                    retUri = TopicEntry.buildTopicUri(id);
                 } else {
                     throw new SQLException("Failed to insert row into " + TopicEntry.TABLE_NAME);
                 }
@@ -159,7 +168,7 @@ public class NewsProvider extends ContentProvider {
             case OPTIONS:
                 id = db.insert(OptionEntry.TABLE_NAME, null, contentValues);
                 if (id > 0) {
-                    retUri = OptionEntry.buildNewsUri(id);
+                    retUri = OptionEntry.buildUri(id);
                 } else {
                     throw new SQLException("Failed to insert row into " + OptionEntry.TABLE_NAME);
                 }

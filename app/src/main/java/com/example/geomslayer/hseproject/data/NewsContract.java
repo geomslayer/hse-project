@@ -60,6 +60,9 @@ public class NewsContract {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
+        // Added when options to question with id needed
+        public static final String PATH_WITH_NEWS = "with_news";
+
         // Columns:
         // The _id of related news
         public static final String COLUMN_NEWS_ID = "news_id";
@@ -70,8 +73,14 @@ public class NewsContract {
         // Whether the option is right
         public static final String COLUMN_IS_ANSWER = "is_answer";
 
-        public static Uri buildNewsUri(long id) {
+        public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        // Builds uri with news id
+        public static Uri buildUriWithNewsId(long id) {
+            return BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME)
+                    .appendPath(PATH_WITH_NEWS).appendPath(String.valueOf(id)).build();
         }
 
         public static long getIdFromUri(Uri uri) {
@@ -87,7 +96,7 @@ public class NewsContract {
         // Columns:
         public static final String COLUMN_BODY = "body";
 
-        public static Uri buildNewsUri(long id) {
+        public static Uri buildTopicUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 

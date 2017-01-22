@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,79 +11,77 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
+import com.example.geomslayer.hseproject.data.NewsContract.OptionEntry;
 import com.example.geomslayer.hseproject.data.NewsContract.TopicEntry;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-public class ReadActivity extends AppCompatActivity implements View.OnClickListener {
+public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "ReadActivity";
 
-    private Entry news;
-    private Question question;
+    private long id;
+
+    @Override
+    int getLayoutResource() {
+        return R.layout.activity_read;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_read);
 
-        Uri newsEntryUri = getIntent().getData();
-        Cursor cursor = getContentResolver().query(newsEntryUri, null, null, null, null);
-        cursor.moveToNext();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        news = new Entry(
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_TITLE)),
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_DATE)),
-                cursor.getString(cursor.getColumnIndexOrThrow(TopicEntry.COLUMN_BODY)),
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_CONTENT))
-        );
+        id = getIntent().getLongExtra(NewsEntry._ID, 0L);
 
-        question = new Question(
-                cursor.getString(cursor.getColumnIndex(NewsEntry.COLUMN_QUESTION)),
-                new ArrayList<>(Arrays.asList("Вариант 1", "Вариант 2", "Вариант 3")),
-                1
-        );
+        if (id == 0) {
+            throw new NullPointerException("Got default parameter in extras!");
+        }
 
-        displayEntry();
-        displayQuestion();
+        Uri newsUri = NewsEntry.buildFullNewsUri(id);
+        Cursor newsCursor = getContentResolver().query(newsUri, null, null, null, null);
+        displayNews(newsCursor);
+
+        Uri optionsUri = OptionEntry.buildUriWithNewsId(id);
+        final String SQL_ORDER = "RANDOM()";
+        Cursor optionsCursor = getContentResolver().query(optionsUri, null, null, null, SQL_ORDER);
+        displayOptions(optionsCursor);
     }
 
-    private void displayEntry() {
-        TextView txtTitle = (TextView) findViewById(R.id.txt_title);
-        TextView txtTopic = (TextView) findViewById(R.id.txt_topic);
-        TextView txtDate = (TextView) findViewById(R.id.txt_date);
-        TextView txtContent = (TextView) findViewById(R.id.txt_content);
-
-        txtTitle.setText(news.getTitle());
-        txtTopic.setText(news.getTopic());
-        txtDate.setText(news.getDate());
-        txtContent.setText(news.getContent());
+    private void displayNews(Cursor cursor) {
+        cursor.moveToFirst();
+        ((TextView) findViewById(R.id.txt_topic)).setText(
+                cursor.getString(cursor.getColumnIndexOrThrow(TopicEntry.COLUMN_BODY)));
+        ((TextView) findViewById(R.id.txt_title)).setText(
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_TITLE)));
+        ((TextView) findViewById(R.id.txt_content)).setText(
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_CONTENT)));
+        ((TextView) findViewById(R.id.txt_date)).setText(
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_DATE)));
+        ((TextView) findViewById(R.id.txt_question)).setText(
+                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_QUESTION)));
     }
 
-    private void displayQuestion() {
-        TextView txtQuestion = (TextView) findViewById(R.id.txt_question);
-        txtQuestion.setText(question.getQuestion());
-
-        LinearLayout ltOptions = (LinearLayout) findViewById(R.id.option_list);
-        ArrayList<String> options = question.getOptions();
-        ViewGroup.LayoutParams ltParams = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        for (int i = 0; i < options.size(); ++i) {
-            Button option = new Button(this);
-            option.setTag(i);
-            option.setText(options.get(i));
-            option.setOnClickListener(this);
-            ltOptions.addView(option, ltParams);
+    private void displayOptions(Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            LinearLayout layoutOptions = (LinearLayout) findViewById(R.id.option_list);
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            final int IS_ANSWER_INDEX = cursor.getColumnIndexOrThrow(OptionEntry.COLUMN_IS_ANSWER);
+            final int BODY_INDEX = cursor.getColumnIndexOrThrow(OptionEntry.COLUMN_BODY);
+            do {
+                Button option = new Button(this);
+                option.setTag(cursor.getInt(IS_ANSWER_INDEX));
+                option.setText(cursor.getString(BODY_INDEX));
+                option.setOnClickListener(this);
+                layoutOptions.addView(option, layoutParams);
+            } while (cursor.moveToNext());
         }
     }
 
     @Override
     public void onClick(View view) {
         int tag = (int) view.getTag();
-        if (question.checkAnswer(tag)) {
+        if (tag != 0) {
             // Toast.makeText(this, getString(R.string.right), Toast.LENGTH_SHORT).show();
             Snackbar.make(findViewById(R.id.activity_read), R.string.right, Snackbar.LENGTH_SHORT).show();
         } else {
