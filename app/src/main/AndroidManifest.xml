@@ -15,17 +15,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ReadActivity"
             android:label=""
-            android:parentActivityName=".MainActivity">
-
-        </activity>
+            android:parentActivityName=".MainActivity" />
 
         <provider
             android:name=".data.NewsProvider"
             android:authorities="com.example.geomslayer.hseproject.data"
             android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".StatsActivity"
+            android:label="@string/statistics"
+            android:launchMode="singleTask" />
 
     </application>
 

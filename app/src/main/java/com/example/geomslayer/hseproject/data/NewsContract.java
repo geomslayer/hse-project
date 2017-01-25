@@ -96,7 +96,7 @@ public class NewsContract {
         // Columns:
         public static final String COLUMN_BODY = "body";
 
-        public static Uri buildTopicUri(long id) {
+        public static Uri buildUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 

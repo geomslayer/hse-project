@@ -152,7 +152,7 @@ public class NewsProvider extends ContentProvider {
             case TOPICS:
                 id = db.insert(TopicEntry.TABLE_NAME, null, contentValues);
                 if (id > 0) {
-                    retUri = TopicEntry.buildTopicUri(id);
+                    retUri = TopicEntry.buildUri(id);
                 } else {
                     throw new SQLException("Failed to insert row into " + TopicEntry.TABLE_NAME);
                 }
