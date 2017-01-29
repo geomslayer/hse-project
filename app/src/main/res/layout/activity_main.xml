@@ -7,31 +7,42 @@
     android:layout_height="match_parent"
     tools:context="com.example.geomslayer.hseproject.MainActivity">
 
-    <Button
-        android:id="@+id/btn_to_entry"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/base_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        <Spinner
+            android:id="@+id/toolbar_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:showAsAction="always" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <ListView
+        android:id="@+id/list_news"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_topic" />
+
+    <Spinner
+        android:id="@+id/spinner_topic"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:onClick="readNewsCallback"
-        android:text="@string/read_news"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/btn_to_stats"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/open_stats"
-        app:layout_constraintLeft_toLeftOf="@+id/btn_to_entry"
-        app:layout_constraintRight_toRightOf="@+id/btn_to_entry"
-        app:layout_constraintTop_toBottomOf="@+id/btn_to_entry" />
 
 </android.support.constraint.ConstraintLayout>

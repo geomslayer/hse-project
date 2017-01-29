@@ -4,4 +4,9 @@
     <string name="open_stats">Open stats</string>
     <string name="right">You are right :)</string>
     <string name="wrong">You are wrong :(</string>
+    <string name="settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="statistics">Statistics</string>
 </resources>
