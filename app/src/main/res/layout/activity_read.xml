@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.geomslayer.hseproject.ReadActivity">
+    tools:context="com.example.geomslayer.hseproject.details.ReadActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/base_toolbar"

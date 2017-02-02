@@ -1,4 +1,4 @@
-package com.example.geomslayer.hseproject;
+package com.example.geomslayer.hseproject.details;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,24 +10,30 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.geomslayer.hseproject.BaseActivity;
+import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
 import com.example.geomslayer.hseproject.data.NewsContract.OptionEntry;
 import com.example.geomslayer.hseproject.data.NewsContract.TopicEntry;
+import com.example.geomslayer.hseproject.stats.StatsManager;
 
 public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "ReadActivity";
 
     private long id;
+    private StatsManager statsManager;
 
     @Override
-    int getLayoutResource() {
+    public int getLayoutResource() {
         return R.layout.activity_read;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        statsManager = StatsManager.getSavedManager(
+                getSharedPreferences(StatsManager.PREF_NAME, MODE_PRIVATE));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -45,6 +51,16 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         final String SQL_ORDER = "RANDOM()";
         Cursor optionsCursor = getContentResolver().query(optionsUri, null, null, null, SQL_ORDER);
         displayOptions(optionsCursor);
+
+        long topicId = newsCursor.getLong(newsCursor.getColumnIndexOrThrow(NewsEntry._ID));
+        statsManager.readNews(topicId);
+    }
+
+    @Override
+    protected void onPause() {
+        StatsManager.saveManager(
+                getSharedPreferences(StatsManager.PREF_NAME, MODE_PRIVATE), statsManager);
+        super.onPause();
     }
 
     private void displayNews(Cursor cursor) {
@@ -82,11 +98,11 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         int tag = (int) view.getTag();
         if (tag != 0) {
-            // Toast.makeText(this, getString(R.string.right), Toast.LENGTH_SHORT).show();
             Snackbar.make(findViewById(R.id.activity_read), R.string.right, Snackbar.LENGTH_SHORT).show();
+            statsManager.answer(true);
         } else {
-            // Toast.makeText(this, getString(R.string.wrong), Toast.LENGTH_SHORT).show();
             Snackbar.make(findViewById(R.id.activity_read), R.string.wrong, Snackbar.LENGTH_SHORT).show();
+            statsManager.answer(false);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.geomslayer.hseproject;
+package com.example.geomslayer.hseproject.mainscreen;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.data.NewsContract;
 
 import java.util.ArrayList;

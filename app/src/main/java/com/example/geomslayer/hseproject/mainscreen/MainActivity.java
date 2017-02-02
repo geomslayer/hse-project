@@ -1,10 +1,8 @@
-package com.example.geomslayer.hseproject;
+package com.example.geomslayer.hseproject.mainscreen;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -13,6 +11,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.example.geomslayer.hseproject.BaseActivity;
+import com.example.geomslayer.hseproject.R;
+import com.example.geomslayer.hseproject.details.ReadActivity;
 import com.example.geomslayer.hseproject.data.NewsContract;
 import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
 
@@ -24,7 +25,7 @@ public class MainActivity extends BaseActivity {
     private Spinner spinnerTopics;
 
     @Override
-    int getLayoutResource() {
+    public int getLayoutResource() {
         return R.layout.activity_main;
     }
 

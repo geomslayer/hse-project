@@ -7,6 +7,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.geomslayer.hseproject.settings.SettingsActivity;
+import com.example.geomslayer.hseproject.stats.StatsActivity;
+
 abstract public class BaseActivity extends AppCompatActivity {
 
     private static final String TAG = "BaseActivity";
@@ -46,5 +49,5 @@ abstract public class BaseActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    abstract int getLayoutResource();
+    public abstract int getLayoutResource();
 }
