@@ -2,10 +2,9 @@ package com.example.geomslayer.hseproject.stats;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
-import com.example.geomslayer.hseproject.BaseActivity;
+import com.example.geomslayer.hseproject.base.BaseActivity;
 import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.data.NewsContract;
 

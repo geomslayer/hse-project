@@ -1,21 +1,21 @@
 package com.example.geomslayer.hseproject.mainscreen;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.example.geomslayer.hseproject.BaseActivity;
 import com.example.geomslayer.hseproject.R;
-import com.example.geomslayer.hseproject.details.ReadActivity;
-import com.example.geomslayer.hseproject.data.NewsContract;
+import com.example.geomslayer.hseproject.base.BaseActivity;
 import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
+import com.example.geomslayer.hseproject.details.ReadActivity;
+import com.example.geomslayer.hseproject.storage.Topic;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+
+import java.util.ArrayList;
 
 public class MainActivity extends BaseActivity {
 
@@ -35,61 +35,61 @@ public class MainActivity extends BaseActivity {
 
         Log.d(TAG, "onCreate: activity created!");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.base_toolbar);
-        spinnerTopics = (Spinner) toolbar.findViewById(R.id.toolbar_spinner);
-
+        spinnerTopics = (Spinner) findViewById(R.id.toolbar_spinner);
         listViewNews = (ListView) findViewById(R.id.list_news);
-        listViewNews.setOnItemClickListener((parent, view, position, id) -> {
-            Intent readIntent = new Intent(this, ReadActivity.class);
-            readIntent.putExtra(NewsEntry._ID, id);
-            startActivity(readIntent);
-        });
+
+        prepareView();
 
         loadTopics();
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "onRestart: activity restarted!");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop: activity stopped!");
-    }
-
-    private void loadTopics() {
-        // Load all topics
-        Cursor topicsCursor = getContentResolver().query(
-                NewsContract.TopicEntry.CONTENT_URI, null, null, null, null);
-        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(
-                this, android.R.layout.simple_spinner_item, topicsCursor,
-                new String[]{NewsContract.TopicEntry.COLUMN_BODY},
-                new int[]{android.R.id.text1}, 0);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTopics.setAdapter(spinnerAdapter);
-
+    private void prepareView() {
         spinnerTopics.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                loadNews(id);
+                loadNews(((Topic) parent.getItemAtPosition(pos)).id);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+        listViewNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                Intent readIntent = new Intent(MainActivity.this, ReadActivity.class);
+                readIntent.putExtra(NewsEntry._ID, id);
+                startActivity(readIntent);
+            }
+        });
+    }
+
+    private void loadTopics() {
+        // Load all topics
+//        Cursor topicsCursor = getContentResolver().query(
+//                NewsContract.TopicEntry.CONTENT_URI, null, null, null, null);
+//        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(
+//                this, android.R.layout.simple_spinner_item, topicsCursor,
+//                new String[]{NewsContract.TopicEntry.COLUMN_BODY},
+//                new int[]{android.R.id.text1}, 0);
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinnerTopics.setAdapter(spinnerAdapter);
+
+        ArrayList<Topic> topics = new ArrayList<>(
+                SQLite.select().from(Topic.class).queryList());
+        spinnerTopics.setAdapter(new TopicAdapter(this, topics));
     }
 
     // Shows news on the main screen on a listView
     private void loadNews(long topicId) {
-        Cursor cursor = getContentResolver().query(
-                NewsEntry.buildSimpleNewsUri(), null,
-                NewsEntry.COLUMN_TOPIC_ID + " = " + topicId,
-                null, NewsEntry.COLUMN_DATE + " DESC");
-        listViewNews.setAdapter(new NewsAdapter(this, cursor));
+//        Cursor cursor = getContentResolver().query(
+//                NewsEntry.buildSimpleNewsUri(), null,
+//                NewsEntry.COLUMN_TOPIC_ID + " = " + topicId,
+//                null, NewsEntry.COLUMN_DATE + " DESC");
+//        listViewNews.setAdapter(new NewsAdapter(this, cursor));
+
+
     }
 
 }
