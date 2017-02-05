@@ -1,28 +1,34 @@
 package com.example.geomslayer.hseproject.details;
 
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.geomslayer.hseproject.base.BaseActivity;
 import com.example.geomslayer.hseproject.R;
-import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
-import com.example.geomslayer.hseproject.data.NewsContract.OptionEntry;
-import com.example.geomslayer.hseproject.data.NewsContract.TopicEntry;
+import com.example.geomslayer.hseproject.base.BaseActivity;
 import com.example.geomslayer.hseproject.stats.StatsManager;
+import com.example.geomslayer.hseproject.storage.News;
+import com.example.geomslayer.hseproject.storage.News_Table;
+import com.example.geomslayer.hseproject.storage.Option;
+import com.example.geomslayer.hseproject.storage.Option_Table;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+
+import java.util.ArrayList;
 
 public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "ReadActivity";
 
-    private long id;
+    public static final String EXTRA_NEWS = "news_extra";
+
     private StatsManager statsManager;
+    private News news;
+    private ArrayList<Option> options;
 
     @Override
     public int getLayoutResource() {
@@ -37,23 +43,28 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        id = getIntent().getLongExtra(NewsEntry._ID, 0L);
+        long newsId = getIntent().getLongExtra(EXTRA_NEWS, 0L);
+        news = SQLite.select()
+                .from(News.class)
+                .where(News_Table.id.eq(newsId))
+                .querySingle();
 
-        if (id == 0) {
-            throw new NullPointerException("Got default parameter in extras!");
+        options = new ArrayList<>(SQLite.select()
+                .from(Option.class)
+                .where(Option_Table.news_id.eq(news.id))
+                .queryList());
+
+        displayNews();
+        displayOptions();
+
+        if (!news.wasRead) {
+            statsManager.readNews(news.topic.id);
+            news.wasRead = true;
+            news.update();
+            Log.d(TAG, "onCreate: just read");
+        } else {
+            Log.d(TAG, "onCreate: already read");
         }
-
-        Uri newsUri = NewsEntry.buildFullNewsUri(id);
-        Cursor newsCursor = getContentResolver().query(newsUri, null, null, null, null);
-        displayNews(newsCursor);
-
-        Uri optionsUri = OptionEntry.buildUriWithNewsId(id);
-        final String SQL_ORDER = "RANDOM()";
-        Cursor optionsCursor = getContentResolver().query(optionsUri, null, null, null, SQL_ORDER);
-        displayOptions(optionsCursor);
-
-        long topicId = newsCursor.getLong(newsCursor.getColumnIndexOrThrow(NewsEntry._ID));
-        statsManager.readNews(topicId);
     }
 
     @Override
@@ -63,46 +74,48 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         super.onPause();
     }
 
-    private void displayNews(Cursor cursor) {
-        cursor.moveToFirst();
-        ((TextView) findViewById(R.id.txt_topic)).setText(
-                cursor.getString(cursor.getColumnIndexOrThrow(TopicEntry.COLUMN_BODY)));
-        ((TextView) findViewById(R.id.txt_title)).setText(
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_TITLE)));
-        ((TextView) findViewById(R.id.txt_content)).setText(
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_CONTENT)));
-        ((TextView) findViewById(R.id.txt_date)).setText(
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_DATE)));
-        ((TextView) findViewById(R.id.txt_question)).setText(
-                cursor.getString(cursor.getColumnIndexOrThrow(NewsEntry.COLUMN_QUESTION)));
+    private void displayNews() {
+        if (news == null) {
+            return;
+        }
+
+        ((TextView) findViewById(R.id.txt_topic)).setText(news.topic.text);
+        ((TextView) findViewById(R.id.txt_title)).setText(news.title);
+        ((TextView) findViewById(R.id.txt_content)).setText(news.text);
+        ((TextView) findViewById(R.id.txt_date)).setText(news.date.toString());
+        ((TextView) findViewById(R.id.txt_question)).setText(news.question);
     }
 
-    private void displayOptions(Cursor cursor) {
-        if (cursor.moveToFirst()) {
-            LinearLayout layoutOptions = (LinearLayout) findViewById(R.id.option_list);
+    private void displayOptions() {
+        if (options == null) {
+            return;
+        }
+
+        LinearLayout layoutOptions = (LinearLayout) findViewById(R.id.option_list);
             ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            final int IS_ANSWER_INDEX = cursor.getColumnIndexOrThrow(OptionEntry.COLUMN_IS_ANSWER);
-            final int BODY_INDEX = cursor.getColumnIndexOrThrow(OptionEntry.COLUMN_BODY);
-            do {
-                Button option = new Button(this);
-                option.setTag(cursor.getInt(IS_ANSWER_INDEX));
-                option.setText(cursor.getString(BODY_INDEX));
-                option.setOnClickListener(this);
-                layoutOptions.addView(option, layoutParams);
-            } while (cursor.moveToNext());
+        for (Option option : options) {
+            Button optionBtn = new Button(this);
+            optionBtn.setTag(option.isAnswer);
+            optionBtn.setText(option.text);
+            optionBtn.setOnClickListener(this);
+            layoutOptions.addView(optionBtn, layoutParams);
         }
     }
 
     @Override
     public void onClick(View view) {
-        int tag = (int) view.getTag();
-        if (tag != 0) {
-            Snackbar.make(findViewById(R.id.activity_read), R.string.right, Snackbar.LENGTH_SHORT).show();
-            statsManager.answer(true);
+        boolean isAnswer = (boolean) view.getTag();
+        Snackbar.make(findViewById(R.id.activity_read),
+                (isAnswer ? R.string.right : R.string.wrong),
+                Snackbar.LENGTH_SHORT).show();
+        if (news.answerStatus == StatsManager.NOT_ANSWERED) {
+            statsManager.answer(isAnswer);
+            news.answerStatus = (isAnswer ? StatsManager.RIGHT_ANSWERED : StatsManager.WRONG_ANSWERED);
+            news.update();
+            Log.d(TAG, "onClick: just answered");
         } else {
-            Snackbar.make(findViewById(R.id.activity_read), R.string.wrong, Snackbar.LENGTH_SHORT).show();
-            statsManager.answer(false);
+            Log.d(TAG, "onClick: already answered");
         }
     }
 }

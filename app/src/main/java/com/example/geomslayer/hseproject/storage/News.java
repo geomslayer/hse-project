@@ -22,6 +22,9 @@ public class News extends BaseModel {
     public Topic topic;
 
     @Column
+    public String title;
+
+    @Column
     public String text;
 
     @Column
@@ -32,4 +35,7 @@ public class News extends BaseModel {
 
     @Column(defaultValue = "0")
     public Boolean wasRead;
+
+    @Column(defaultValue = "0")
+    public int answerStatus;
 }

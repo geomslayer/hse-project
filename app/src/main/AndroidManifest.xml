@@ -22,11 +22,6 @@
             android:label=""
             android:parentActivityName=".mainscreen.MainActivity" />
 
-        <provider
-            android:name=".data.NewsProvider"
-            android:authorities="com.example.geomslayer.hseproject.data"
-            android:exported="false" />
-
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/settings"

@@ -12,10 +12,6 @@ import com.example.geomslayer.hseproject.storage.Topic;
 
 import java.util.ArrayList;
 
-/**
- * Created by geomslayer on 05.02.17.
- */
-
 public class TopicAdapter extends ArrayAdapter<Topic> {
 
     public TopicAdapter(Context context, ArrayList<Topic> topicList) {

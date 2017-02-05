@@ -20,6 +20,9 @@ public class BaseApp extends Application {
 
         FlowManager.init(new FlowConfig.Builder(this).build());
 
+//        deleteDatabase(AppDatabase.NAME + ".db");
+//        StatsManager.saveManager(getSharedPreferences(StatsManager.PREF_NAME, 0), null);
+
         // add dummy data
         if (SQLite.select().from(Topic.class).count() == 0) {
             Random rand = new Random();
@@ -45,6 +48,7 @@ public class BaseApp extends Application {
             news1.date = new Date(rand.nextLong());
             news1.question = "Question 1";
             news1.text = "News 1";
+            news1.title = "Title 1";
             news1.save();
 
             News news2 = new News();
@@ -52,6 +56,7 @@ public class BaseApp extends Application {
             news2.date = new Date(rand.nextLong());
             news2.question = "Question 2";
             news2.text = "News 2";
+            news2.title = "Title 2";
             news2.save();
 
             News news3 = new News();
@@ -59,6 +64,7 @@ public class BaseApp extends Application {
             news3.date = new Date(rand.nextLong());
             news3.question = "Question 3";
             news3.text = "News 3";
+            news3.title = "Title 3";
             news3.save();
 
             News news4 = new News();
@@ -66,6 +72,7 @@ public class BaseApp extends Application {
             news4.date = new Date(rand.nextLong());
             news4.question = "Question 4";
             news4.text = "News 4";
+            news4.title = "Title 4";
             news4.save();
 
             News news5 = new News();
@@ -73,6 +80,7 @@ public class BaseApp extends Application {
             news5.date = new Date(rand.nextLong());
             news5.question = "Question 5";
             news5.text = "News 5";
+            news5.title = "Title 5";
             news5.save();
 
             News news6 = new News();
@@ -80,6 +88,7 @@ public class BaseApp extends Application {
             news6.date = new Date(rand.nextLong());
             news6.question = "Question 6";
             news6.text = "News 6";
+            news6.title = "Title 6";
             news6.save();
 
             // options

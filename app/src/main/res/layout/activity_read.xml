@@ -9,7 +9,7 @@
     tools:context="com.example.geomslayer.hseproject.details.ReadActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/base_toolbar"
+        android:id="@+id/tb_main"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"

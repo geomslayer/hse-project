@@ -2,16 +2,17 @@ package com.example.geomslayer.hseproject.mainscreen;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.base.BaseActivity;
-import com.example.geomslayer.hseproject.data.NewsContract.NewsEntry;
 import com.example.geomslayer.hseproject.details.ReadActivity;
+import com.example.geomslayer.hseproject.storage.News;
+import com.example.geomslayer.hseproject.storage.News_Table;
 import com.example.geomslayer.hseproject.storage.Topic;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
@@ -21,8 +22,9 @@ public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
 
-    private ListView listViewNews;
+    private RecyclerView rvNews;
     private Spinner spinnerTopics;
+    private ArrayList<News> newsList;
 
     @Override
     public int getLayoutResource() {
@@ -33,17 +35,13 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "onCreate: activity created!");
-
-        spinnerTopics = (Spinner) findViewById(R.id.toolbar_spinner);
-        listViewNews = (ListView) findViewById(R.id.list_news);
-
         prepareView();
-
         loadTopics();
     }
 
     private void prepareView() {
+
+        spinnerTopics = (Spinner) findViewById(R.id.sp_topics);
         spinnerTopics.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
@@ -55,27 +53,12 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        listViewNews.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                Intent readIntent = new Intent(MainActivity.this, ReadActivity.class);
-                readIntent.putExtra(NewsEntry._ID, id);
-                startActivity(readIntent);
-            }
-        });
+        rvNews = (RecyclerView) findViewById(R.id.rv_news);
+        rvNews.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    // Load all topics
     private void loadTopics() {
-        // Load all topics
-//        Cursor topicsCursor = getContentResolver().query(
-//                NewsContract.TopicEntry.CONTENT_URI, null, null, null, null);
-//        SimpleCursorAdapter spinnerAdapter = new SimpleCursorAdapter(
-//                this, android.R.layout.simple_spinner_item, topicsCursor,
-//                new String[]{NewsContract.TopicEntry.COLUMN_BODY},
-//                new int[]{android.R.id.text1}, 0);
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        spinnerTopics.setAdapter(spinnerAdapter);
-
         ArrayList<Topic> topics = new ArrayList<>(
                 SQLite.select().from(Topic.class).queryList());
         spinnerTopics.setAdapter(new TopicAdapter(this, topics));
@@ -83,13 +66,20 @@ public class MainActivity extends BaseActivity {
 
     // Shows news on the main screen on a listView
     private void loadNews(long topicId) {
-//        Cursor cursor = getContentResolver().query(
-//                NewsEntry.buildSimpleNewsUri(), null,
-//                NewsEntry.COLUMN_TOPIC_ID + " = " + topicId,
-//                null, NewsEntry.COLUMN_DATE + " DESC");
-//        listViewNews.setAdapter(new NewsAdapter(this, cursor));
-
-
+        newsList = new ArrayList<>(SQLite.select()
+                .from(News.class)
+                .where(News_Table.topic_id.eq(topicId))
+                .queryList());
+        NewsAdapter adapter = new NewsAdapter(this, newsList);
+        adapter.setOnitemClickListener(new NewsAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int position) {
+                Intent readIntent = new Intent(MainActivity.this, ReadActivity.class);
+                readIntent.putExtra(ReadActivity.EXTRA_NEWS, newsList.get(position).id);
+                startActivity(readIntent);
+            }
+        });
+        rvNews.setAdapter(adapter);
     }
 
 }

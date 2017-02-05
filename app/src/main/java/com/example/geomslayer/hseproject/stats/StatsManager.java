@@ -11,6 +11,10 @@ public class StatsManager {
     private static final String PREF_STATS = "pref_stats";
     public static final String PREF_NAME = "statistics";
 
+    public static final int NOT_ANSWERED = 0;
+    public static final int RIGHT_ANSWERED = 1;
+    public static final int WRONG_ANSWERED = 2;
+
     private long popularTopicId;
     private TreeMap<Long, Integer> count;
     private int allAnswered;
@@ -46,11 +50,11 @@ public class StatsManager {
 
     public static StatsManager getSavedManager(SharedPreferences sp) {
         String json = sp.getString(PREF_STATS, "");
-        Log.d("Manager", "getSavedManager: " + json);
-        if (json.equals("")) {
+        StatsManager instance = new Gson().fromJson(json, StatsManager.class);
+        if (instance == null) {
             return new StatsManager();
         }
-        return new Gson().fromJson(json, StatsManager.class);
+        return instance;
     }
 
     public static void saveManager(SharedPreferences sp, StatsManager manager) {
