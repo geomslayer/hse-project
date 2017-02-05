@@ -1,7 +1,9 @@
-package com.example.geomslayer.hseproject;
+package com.example.geomslayer.hseproject.settings;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import com.example.geomslayer.hseproject.R;
 
 public class SettingsFragment extends PreferenceFragment {
 

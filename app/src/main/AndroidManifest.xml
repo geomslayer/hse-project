@@ -3,12 +3,13 @@
     package="com.example.geomslayer.hseproject">
 
     <application
+        android:name=".base.BaseApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".MainActivity">
+        <activity android:name=".mainscreen.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,22 +18,17 @@
         </activity>
 
         <activity
-            android:name=".ReadActivity"
+            android:name=".details.ReadActivity"
             android:label=""
-            android:parentActivityName=".MainActivity" />
-
-        <provider
-            android:name=".data.NewsProvider"
-            android:authorities="com.example.geomslayer.hseproject.data"
-            android:exported="false" />
+            android:parentActivityName=".mainscreen.MainActivity" />
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:label="@string/settings"
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".StatsActivity"
+            android:name=".stats.StatsActivity"
             android:label="@string/statistics"
             android:launchMode="singleTask" />
 

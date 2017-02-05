@@ -1,4 +1,4 @@
-package com.example.geomslayer.hseproject;
+package com.example.geomslayer.hseproject.base;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.example.geomslayer.hseproject.R;
+import com.example.geomslayer.hseproject.settings.SettingsActivity;
+import com.example.geomslayer.hseproject.stats.StatsActivity;
 
 abstract public class BaseActivity extends AppCompatActivity {
 
@@ -16,7 +20,7 @@ abstract public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResource());
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.base_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tb_main);
         setSupportActionBar(toolbar);
     }
 
@@ -25,8 +29,6 @@ abstract public class BaseActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.base_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -46,5 +48,5 @@ abstract public class BaseActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    abstract int getLayoutResource();
+    public abstract int getLayoutResource();
 }
