@@ -84,8 +84,10 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         if (article.img.equals("")) {
             imgView.setVisibility(View.GONE);
         } else {
-            Picasso.with(this)
-                    .load(article.img)
+            Picasso.with(this).load(article.img)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .noFade()
                     .into(imgView);
         }
     }
@@ -96,8 +98,8 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         }
 
         LinearLayout layoutOptions = (LinearLayout) findViewById(R.id.option_list);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (Option option : options) {
             Button optionBtn = new Button(this);
             optionBtn.setTag(option.isAnswer);

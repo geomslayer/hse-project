@@ -37,6 +37,7 @@ public class MainActivity extends BaseActivity {
     private Spinner spinnerTopics;
     private ArrayList<Article> newsList;
     private ArrayList<Category> catsList;
+    private LinearLayoutManager layoutManager;
 
     @Override
     public int getLayoutResource() {
@@ -94,6 +95,17 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    Category getCurrentCategory() {
+        return catsList.get(spinnerTopics.getSelectedItemPosition());
+    }
+
+    LinearLayoutManager getLayoutManager() {
+        if (layoutManager == null) {
+            layoutManager = new LinearLayoutManager(this);
+        }
+        return layoutManager;
+    }
+
     // Shows news on the main screen on a listView
     private void loadNews(long topicId) {
         if (newsList != null && !newsList.isEmpty()) {
@@ -123,7 +135,7 @@ public class MainActivity extends BaseActivity {
                         Intent readIntent = new Intent(MainActivity.this, ReadActivity.class);
 //                        readIntent.putExtra(ReadActivity.EXTRA_NEWS, newsList.get(position).id);
                         Article curArticle = newsList.get(position);
-                        curArticle.categoryObj = catsList.get(spinnerTopics.getSelectedItemPosition());
+                        curArticle.categoryObj = getCurrentCategory();
                         readIntent.putExtra(ReadActivity.EXTRA_NEWS,
                                 new Gson().toJson(curArticle, Article.class));
                         startActivity(readIntent);
@@ -133,11 +145,48 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void run() {
                         rvNews.setAdapter(adapter);
+                        rvNews.setLayoutManager(getLayoutManager());
+                        rvNews.addOnScrollListener(scrollListener);
                     }
                 });
             }
         });
 
     }
+
+    private EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(
+            getLayoutManager()) {
+        @Override
+        public void onLoadMore(int page, final int totalItemsCount, RecyclerView view) {
+            Article lastArticle = newsList.get(totalItemsCount - 1);
+            String url = String.format("http://52.36.210.200/news/%d/%d/%d",
+                    getCurrentCategory().id, lastArticle.date, lastArticle.id);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            BaseApp.getHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    Type type = new TypeToken<ArrayList<Article>>() {}.getType();
+                    final ArrayList<Article> newArticles = new Gson().fromJson(response.body().string(), type);
+                    if (!newArticles.isEmpty()) {
+                        newsList.addAll(newArticles);
+                        MainActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                rvNews.getAdapter().notifyItemRangeInserted(
+                                        totalItemsCount, newArticles.size());
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    };
 
 }
