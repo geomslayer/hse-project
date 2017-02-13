@@ -8,17 +8,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.geomslayer.hseproject.R;
-import com.example.geomslayer.hseproject.storage.News;
+import com.example.geomslayer.hseproject.networking.Article;
 
 import java.util.List;
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
-    private List<News> newsList;
+    private List<Article> newsList;
     private Context context;
     private OnItemClickListener listener;
 
-    public NewsAdapter(Context context, List<News> newsList) {
+    public NewsAdapter(Context context, List<Article> newsList) {
         this.context = context;
         this.newsList = newsList;
     }
@@ -40,7 +40,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        News curNews = newsList.get(position);
+        Article curNews = newsList.get(position);
         holder.title.setText(curNews.title);
         holder.text.setText(curNews.text);
     }

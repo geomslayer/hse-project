@@ -40,14 +40,16 @@ dependencies {
 
     // android stuff
     compile "com.android.support:appcompat-v7:${androidLibs}"
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta5'
     compile "com.android.support:recyclerview-v7:${androidLibs}"
     compile "com.android.support:design:${androidLibs}"
     compile "com.android.support:support-v4:${androidLibs}"
     testCompile 'junit:junit:4.12'
 
-    //  Gson
+    //  Network
     compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.okhttp3:okhttp:3.3.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 
     // DBFlow
     annotationProcessor "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"

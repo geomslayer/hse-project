@@ -8,20 +8,20 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.geomslayer.hseproject.storage.Topic;
+import com.example.geomslayer.hseproject.networking.Category;
 
 import java.util.ArrayList;
 
-public class TopicAdapter extends ArrayAdapter<Topic> {
+public class TopicAdapter extends ArrayAdapter<Category> {
 
-    public TopicAdapter(Context context, ArrayList<Topic> topicList) {
+    public TopicAdapter(Context context, ArrayList<Category> topicList) {
         super(context, android.R.layout.simple_spinner_item, topicList);
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Topic topic = getItem(position);
+        Category topic = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext())
                     .inflate(android.R.layout.simple_spinner_item, null);
@@ -32,7 +32,7 @@ public class TopicAdapter extends ArrayAdapter<Topic> {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        Topic topic = getItem(position);
+        Category topic = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext())
                     .inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
