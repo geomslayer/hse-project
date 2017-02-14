@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.geomslayer.hseproject.R;
@@ -23,7 +24,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         this.newsList = newsList;
     }
 
-    public void setOnitemClickListener(OnItemClickListener listener) {
+    public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
@@ -43,6 +44,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         Article curNews = newsList.get(position);
         holder.title.setText(curNews.title);
         holder.text.setText(curNews.text);
+        if (curNews.status == Article.NOT_READ) {
+            holder.img.setVisibility(View.VISIBLE);
+        } else {
+            holder.img.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -54,12 +60,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         TextView title;
         TextView text;
+        ImageView img;
 
         ViewHolder(View itemView) {
             super(itemView);
 
             title = (TextView) itemView.findViewById(R.id.txt_itemTitle);
             text = (TextView) itemView.findViewById(R.id.txt_itemText);
+            img = (ImageView) itemView.findViewById(R.id.img_new);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

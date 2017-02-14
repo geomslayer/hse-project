@@ -2,6 +2,7 @@ package com.example.geomslayer.hseproject.mainscreen;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,8 +16,12 @@ import com.example.geomslayer.hseproject.base.BaseApp;
 import com.example.geomslayer.hseproject.details.ReadActivity;
 import com.example.geomslayer.hseproject.networking.Article;
 import com.example.geomslayer.hseproject.networking.Category;
+import com.example.geomslayer.hseproject.stats.StatsManager;
+import com.example.geomslayer.hseproject.storage.Info;
+import com.example.geomslayer.hseproject.storage.Info_Table;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -38,6 +43,8 @@ public class MainActivity extends BaseActivity {
     private ArrayList<Article> newsList;
     private ArrayList<Category> catsList;
     private LinearLayoutManager layoutManager;
+    private StatsManager statsManager;
+    private boolean canLoad = false;
 
     @Override
     public int getLayoutResource() {
@@ -52,13 +59,29 @@ public class MainActivity extends BaseActivity {
         loadTopics();
     }
 
-    private void prepareView() {
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
 
+        statsManager = StatsManager.getSavedManager(
+                getSharedPreferences(StatsManager.PREF_NAME, 0));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        StatsManager.saveManager(getSharedPreferences(StatsManager.PREF_NAME, 0), statsManager);
+    }
+
+    private void prepareView() {
         spinnerTopics = (Spinner) findViewById(R.id.sp_topics);
         spinnerTopics.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                loadNews(((Category) parent.getItemAtPosition(pos)).id);
+                if (canLoad) {
+                    loadNews(((Category) parent.getItemAtPosition(pos)).id);
+                }
             }
 
             @Override
@@ -89,6 +112,14 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void run() {
                         spinnerTopics.setAdapter(new TopicAdapter(MainActivity.this, catsList));
+                        long favCatId = statsManager.getPopularTopicId();
+                        canLoad = true;
+                        for (int i = 0; i < catsList.size(); ++i) {
+                            if (catsList.get(i).id == favCatId) {
+                                spinnerTopics.setSelection(i);
+                                break;
+                            }
+                        }
                     }
                 });
             }
@@ -128,30 +159,43 @@ public class MainActivity extends BaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 Type type = new TypeToken<ArrayList<Article>>() {}.getType();
                 newsList = new Gson().fromJson(response.body().string(), type);
+                for (Article art : newsList) {
+                    Info info = SQLite.select().from(Info.class)
+                            .where(Info_Table.id.eq(art.id)).querySingle();
+                    art.status = info == null ? Article.NOT_READ : Article.WAS_READ;
+                }
                 final NewsAdapter adapter = new NewsAdapter(MainActivity.this, newsList);
-                adapter.setOnitemClickListener(new NewsAdapter.OnItemClickListener() {
+                adapter.setOnItemClickListener(new NewsAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View itemView, int position) {
                         Intent readIntent = new Intent(MainActivity.this, ReadActivity.class);
-//                        readIntent.putExtra(ReadActivity.EXTRA_NEWS, newsList.get(position).id);
                         Article curArticle = newsList.get(position);
+                        if (curArticle.status == Article.NOT_READ) {
+                            curArticle.status = Article.WAS_READ;
+                            Info info = new Info(curArticle.id);
+                            info.save();
+                            statsManager.readNews(curArticle.category);
+                            rvNews.getAdapter().notifyItemChanged(position);
+                        }
                         curArticle.categoryObj = getCurrentCategory();
                         readIntent.putExtra(ReadActivity.EXTRA_NEWS,
                                 new Gson().toJson(curArticle, Article.class));
                         startActivity(readIntent);
                     }
                 });
+                final DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                        rvNews.getContext(), layoutManager.getOrientation());
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         rvNews.setAdapter(adapter);
                         rvNews.setLayoutManager(getLayoutManager());
                         rvNews.addOnScrollListener(scrollListener);
+                        rvNews.addItemDecoration(dividerItemDecoration);
                     }
                 });
             }
         });
-
     }
 
     private EndlessRecyclerViewScrollListener scrollListener = new EndlessRecyclerViewScrollListener(
@@ -174,6 +218,11 @@ public class MainActivity extends BaseActivity {
                 public void onResponse(Call call, Response response) throws IOException {
                     Type type = new TypeToken<ArrayList<Article>>() {}.getType();
                     final ArrayList<Article> newArticles = new Gson().fromJson(response.body().string(), type);
+                    for (Article art : newArticles) {
+                        Info info = SQLite.select().from(Info.class)
+                                .where(Info_Table.id.eq(art.id)).querySingle();
+                        art.status = info == null ? Article.NOT_READ : Article.WAS_READ;
+                    }
                     if (!newArticles.isEmpty()) {
                         newsList.addAll(newArticles);
                         MainActivity.this.runOnUiThread(new Runnable() {

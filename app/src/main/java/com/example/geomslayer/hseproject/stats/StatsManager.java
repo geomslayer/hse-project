@@ -58,7 +58,6 @@ public class StatsManager {
     }
 
     public static void saveManager(SharedPreferences sp, StatsManager manager) {
-        Log.d("Manager", "saveManager: " + new Gson().toJson(manager));
         sp.edit()
                 .putString(PREF_STATS, new Gson().toJson(manager))
                 .apply();

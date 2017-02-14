@@ -85,7 +85,7 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
             imgView.setVisibility(View.GONE);
         } else {
             Picasso.with(this).load(article.img)
-                    .placeholder(R.mipmap.ic_launcher)
+                    .placeholder(R.drawable.news_placeholder)
                     .error(R.mipmap.ic_launcher)
                     .noFade()
                     .into(imgView);
