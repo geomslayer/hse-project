@@ -1,18 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="8dp">
 
-    <TextView
-        android:id="@+id/txt_itemTitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        tools:text="TextView" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_marginBottom="8dp"
+            android:id="@+id/txt_itemTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="TextView\nsdfgsdfgs\nsdfgsdfg"/>
+
+        <ImageView
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:id="@+id/img_new"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            app:srcCompat="@drawable/ic_new"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txt_itemText"
@@ -20,6 +39,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="5"
-        tools:text="TextView" />
+        tools:text="TextView\nsdfg\nsfdgsdf\nsfgsdfg\nsdfgsdfg\nsdfgsdfg\nsdfgsdg\nsdfgsdfg\nsdfgdsfg"/>
+
 
 </LinearLayout>

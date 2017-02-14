@@ -8,10 +8,6 @@ import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.sql.Date;
 
-/**
- * Created by geomslayer on 04.02.17.
- */
-
 @Table(database = AppDatabase.class)
 public class News extends BaseModel {
 

@@ -6,28 +6,35 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.base.BaseActivity;
+import com.example.geomslayer.hseproject.networking.Article;
 import com.example.geomslayer.hseproject.stats.StatsManager;
 import com.example.geomslayer.hseproject.storage.News;
-import com.example.geomslayer.hseproject.storage.News_Table;
 import com.example.geomslayer.hseproject.storage.Option;
-import com.example.geomslayer.hseproject.storage.Option_Table;
-import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "ReadActivity";
 
     public static final String EXTRA_NEWS = "news_extra";
+    public static final String EXTRA_CAT = "cat_extra";
 
     private StatsManager statsManager;
     private News news;
+    private Article article;
     private ArrayList<Option> options;
 
     @Override
@@ -43,28 +50,18 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        long newsId = getIntent().getLongExtra(EXTRA_NEWS, 0L);
-        news = SQLite.select()
-                .from(News.class)
-                .where(News_Table.id.eq(newsId))
-                .querySingle();
+        String zipArticle = getIntent().getStringExtra(EXTRA_NEWS);
+        article = new Gson().fromJson(zipArticle, Article.class);
+        displayArticle();
 
-        options = new ArrayList<>(SQLite.select()
-                .from(Option.class)
-                .where(Option_Table.news_id.eq(news.id))
-                .queryList());
-
-        displayNews();
-        displayOptions();
-
-        if (!news.wasRead) {
-            statsManager.readNews(news.topic.id);
-            news.wasRead = true;
-            news.update();
-            Log.d(TAG, "onCreate: just read");
-        } else {
-            Log.d(TAG, "onCreate: already read");
-        }
+//        if (!news.wasRead) {
+//            statsManager.readNews(news.topic.id);
+//            news.wasRead = true;
+//            news.update();
+//            Log.d(TAG, "onCreate: just read");
+//        } else {
+//            Log.d(TAG, "onCreate: already read");
+//        }
     }
 
     @Override
@@ -74,16 +71,25 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         super.onPause();
     }
 
-    private void displayNews() {
-        if (news == null) {
-            return;
-        }
+    private void displayArticle() {
+        ((TextView) findViewById(R.id.txt_topic)).setText(article.categoryObj.text);
+        ((TextView) findViewById(R.id.txt_title)).setText(article.title);
+        ((TextView) findViewById(R.id.txt_content)).setText(article.text);
 
-        ((TextView) findViewById(R.id.txt_topic)).setText(news.topic.text);
-        ((TextView) findViewById(R.id.txt_title)).setText(news.title);
-        ((TextView) findViewById(R.id.txt_content)).setText(news.text);
-        ((TextView) findViewById(R.id.txt_date)).setText(news.date.toString());
-        ((TextView) findViewById(R.id.txt_question)).setText(news.question);
+        Date date = new Date(article.date);
+        DateFormat df = new SimpleDateFormat("HH:mm, dd MMMM yyyy", new Locale("ru", "RU"));
+        ((TextView) findViewById(R.id.txt_date)).setText(df.format(date));
+
+        ImageView imgView = (ImageView) findViewById(R.id.img_article);
+        if (article.img.equals("")) {
+            imgView.setVisibility(View.GONE);
+        } else {
+            Picasso.with(this).load(article.img)
+                    .placeholder(R.drawable.news_placeholder)
+                    .error(R.mipmap.ic_launcher)
+                    .noFade()
+                    .into(imgView);
+        }
     }
 
     private void displayOptions() {
@@ -92,8 +98,8 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         }
 
         LinearLayout layoutOptions = (LinearLayout) findViewById(R.id.option_list);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (Option option : options) {
             Button optionBtn = new Button(this);
             optionBtn.setTag(option.isAnswer);

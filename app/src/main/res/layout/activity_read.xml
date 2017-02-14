@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_read"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.geomslayer.hseproject.details.ReadActivity">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/activity_read"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.example.geomslayer.hseproject.details.ReadActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/tb_main"
@@ -25,6 +25,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <ImageView
+                android:id="@+id/img_article"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_title"
+                android:background="@android:color/black"/>
+
             <TextView
                 android:id="@+id/txt_topic"
                 android:layout_width="0dp"
@@ -34,10 +45,10 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:text="Topic"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/txt_date"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Topic"/>
 
             <TextView
                 android:id="@+id/txt_date"
@@ -45,45 +56,45 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
                 android:layout_marginRight="16dp"
-                android:text="Date"
                 app:layout_constraintBaseline_toBaselineOf="@+id/txt_topic"
-                app:layout_constraintRight_toRightOf="parent" />
+                app:layout_constraintRight_toRightOf="parent"
+                tools:text="Date"/>
 
             <TextView
                 android:id="@+id/txt_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Title"
                 android:textStyle="bold"
                 app:layout_constraintLeft_toLeftOf="@+id/txt_topic"
                 app:layout_constraintRight_toRightOf="@+id/txt_date"
-                app:layout_constraintTop_toBottomOf="@+id/txt_topic" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_topic"
+                tools:text="Title"/>
 
             <TextView
                 android:id="@+id/txt_content"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Content"
                 app:layout_constraintLeft_toLeftOf="@+id/txt_title"
                 app:layout_constraintRight_toRightOf="@+id/txt_title"
-                app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+                app:layout_constraintTop_toBottomOf="@+id/img_article"
+                tools:text="Content"/>
 
             <TextView
                 android:id="@+id/txt_question"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Question"
                 app:layout_constraintLeft_toLeftOf="@+id/txt_content"
                 app:layout_constraintRight_toRightOf="@+id/txt_content"
-                app:layout_constraintTop_toBottomOf="@+id/txt_content" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_content"
+                tools:text="Question"/>
 
             <LinearLayout
                 android:id="@+id/option_list"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
