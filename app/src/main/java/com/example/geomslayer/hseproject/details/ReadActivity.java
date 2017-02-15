@@ -2,7 +2,6 @@ package com.example.geomslayer.hseproject.details;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,7 +13,6 @@ import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.base.BaseActivity;
 import com.example.geomslayer.hseproject.networking.Article;
 import com.example.geomslayer.hseproject.stats.StatsManager;
-import com.example.geomslayer.hseproject.storage.News;
 import com.example.geomslayer.hseproject.storage.Option;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -22,6 +20,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
@@ -33,7 +32,6 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
     public static final String EXTRA_CAT = "cat_extra";
 
     private StatsManager statsManager;
-    private News news;
     private Article article;
     private ArrayList<Option> options;
 
@@ -54,14 +52,16 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         article = new Gson().fromJson(zipArticle, Article.class);
         displayArticle();
 
-//        if (!news.wasRead) {
-//            statsManager.readNews(news.topic.id);
-//            news.wasRead = true;
-//            news.update();
-//            Log.d(TAG, "onCreate: just read");
-//        } else {
-//            Log.d(TAG, "onCreate: already read");
-//        }
+        Option opt1 = new Option();
+        opt1.isAnswer = true;
+        opt1.text = "Да! Отлично!";
+
+        Option opt2 = new Option();
+        opt2.isAnswer = false;
+        opt2.text = "Нет. Грустно...";
+
+        options = new ArrayList<>(Arrays.asList(opt1, opt2));
+        displayOptions();
     }
 
     @Override
@@ -90,6 +90,9 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
                     .noFade()
                     .into(imgView);
         }
+
+        // tmp:
+        ((TextView) findViewById(R.id.txt_question)).setText("Понравилась новость?");
     }
 
     private void displayOptions() {
@@ -115,13 +118,13 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         Snackbar.make(findViewById(R.id.activity_read),
                 (isAnswer ? R.string.right : R.string.wrong),
                 Snackbar.LENGTH_SHORT).show();
-        if (news.answerStatus == StatsManager.NOT_ANSWERED) {
-            statsManager.answer(isAnswer);
-            news.answerStatus = (isAnswer ? StatsManager.RIGHT_ANSWERED : StatsManager.WRONG_ANSWERED);
-            news.update();
-            Log.d(TAG, "onClick: just answered");
-        } else {
-            Log.d(TAG, "onClick: already answered");
-        }
+//        if (news.answerStatus == StatsManager.NOT_ANSWERED) {
+//            statsManager.answer(isAnswer);
+//            news.answerStatus = (isAnswer ? StatsManager.RIGHT_ANSWERED : StatsManager.WRONG_ANSWERED);
+//            news.update();
+//            Log.d(TAG, "onClick: just answered");
+//        } else {
+//            Log.d(TAG, "onClick: already answered");
+//        }
     }
 }
