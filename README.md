@@ -39,4 +39,4 @@
 
 # Отчет к контрольной точке 2
 
-Находится в отдельном файле: https://github.com/geomslayer/hse-project/blob/master/report_kt2.md
+Находится в [отдельном файле](https://github.com/geomslayer/hse-project/blob/master/REPORT_KT2.md).
