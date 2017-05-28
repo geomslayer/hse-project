@@ -20,7 +20,7 @@ abstract public class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutResource());
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tb_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.networking.Category;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class TopicAdapter extends ArrayAdapter<Category> {
 
     public TopicAdapter(Context context, ArrayList<Category> topicList) {
-        super(context, android.R.layout.simple_spinner_item, topicList);
+        super(context, R.layout.spinner_dropdown_item, topicList);
     }
 
     @NonNull
@@ -24,9 +25,9 @@ public class TopicAdapter extends ArrayAdapter<Category> {
         Category topic = getItem(position);
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext())
-                    .inflate(android.R.layout.simple_spinner_item, null);
+                    .inflate(R.layout.spinner_dropdown_item, null);
         }
-        ((TextView) convertView.findViewById(android.R.id.text1)).setText(topic.text);
+        ((TextView) convertView.findViewById(R.id.text)).setText(topic.text);
         return convertView;
     }
 

@@ -12,7 +12,6 @@ import android.widget.Spinner;
 
 import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.base.BaseActivity;
-import com.example.geomslayer.hseproject.base.BaseApp;
 import com.example.geomslayer.hseproject.details.ReadActivity;
 import com.example.geomslayer.hseproject.networking.Article;
 import com.example.geomslayer.hseproject.networking.Category;
@@ -37,6 +36,7 @@ import static com.example.geomslayer.hseproject.base.BaseApp.getHttpClient;
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
+    private static final String BASE_URL = "http://52.36.210.200/";
 
     private RecyclerView rvNews;
     private Spinner spinnerTopics;
@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity {
     // Load all topics
     private void loadTopics() {
         Request request = new Request.Builder()
-                .url("http://52.36.210.200/categories")
+                .url(BASE_URL + "categories")
                 .build();
         getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
@@ -144,11 +144,11 @@ public class MainActivity extends BaseActivity {
             rvNews.getAdapter().notifyDataSetChanged();
         }
 
-        String url = "http://52.36.210.200/news/" + topicId;
+        String url = BASE_URL + "news/" + topicId;
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        BaseApp.getHttpClient().newCall(request).enqueue(new Callback() {
+        getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "onFailure: couldn't load news.");
@@ -203,12 +203,12 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onLoadMore(int page, final int totalItemsCount, RecyclerView view) {
             Article lastArticle = newsList.get(totalItemsCount - 1);
-            String url = String.format("http://52.36.210.200/news/%d/%d/%d",
+            String url = BASE_URL + String.format("news/%d/%d/%d",
                     getCurrentCategory().id, lastArticle.date, lastArticle.id);
             Request request = new Request.Builder()
                     .url(url)
                     .build();
-            BaseApp.getHttpClient().newCall(request).enqueue(new Callback() {
+            getHttpClient().newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 
