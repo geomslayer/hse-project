@@ -16,8 +16,11 @@ import com.example.geomslayer.hseproject.base.BaseApp;
 import com.example.geomslayer.hseproject.networking.Article;
 import com.example.geomslayer.hseproject.networking.Question;
 import com.example.geomslayer.hseproject.stats.StatsManager;
+import com.example.geomslayer.hseproject.storage.Info;
+import com.example.geomslayer.hseproject.storage.Info_Table;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -40,6 +43,8 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
     public static final String EXTRA_NEWS = "news_extra";
     public static final String EXTRA_CAT = "cat_extra";
 
+    public static final String HIDDEN = "________";
+
     private StatsManager statsManager;
     private Article article;
 
@@ -60,7 +65,17 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         article = new Gson().fromJson(zipArticle, Article.class);
         displayArticle();
 
-        requestQuestions(article.id);
+        Info info = SQLite.select()
+                .from(Info.class)
+                .where(Info_Table.id.eq(article.id))
+                .querySingle();
+
+        if (info == null || info.status == StatsManager.NOT_ANSWERED) {
+            requestQuestions(article.id);
+        } else {
+            replaceHidden();
+            ((TextView) findViewById(R.id.txt_question)).setText(R.string.already_answered);
+        }
     }
 
     @Override
@@ -136,19 +151,29 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         });
     }
 
+    private void replaceHidden() {
+        article.text = article.text.replace(HIDDEN, article.hidden);
+        ((TextView) findViewById(R.id.txt_content)).setText(article.text);
+    }
+
     @Override
     public void onClick(View view) {
         boolean isAnswer = (boolean) view.getTag();
         Snackbar.make(findViewById(R.id.activity_read),
                 (isAnswer ? R.string.right : R.string.wrong),
                 Snackbar.LENGTH_SHORT).show();
-//        if (news.answerStatus == StatsManager.NOT_ANSWERED) {
-//            statsManager.answer(isAnswer);
-//            news.answerStatus = (isAnswer ? StatsManager.RIGHT_ANSWERED : StatsManager.WRONG_ANSWERED);
-//            news.update();
-//            Log.d(TAG, "onClick: just answered");
-//        } else {
-//            Log.d(TAG, "onClick: already answered");
-//        }
+        Info info = SQLite.select()
+                .from(Info.class)
+                .where(Info_Table.id.eq(article.id))
+                .querySingle();
+        if (info == null) {
+            info = new Info(article.id);
+        }
+        if (info.status == StatsManager.NOT_ANSWERED) {
+            replaceHidden();
+            statsManager.answer(isAnswer);
+            info.status = (isAnswer ? StatsManager.RIGHT_ANSWERED : StatsManager.WRONG_ANSWERED);
+            info.update();
+        }
     }
 }

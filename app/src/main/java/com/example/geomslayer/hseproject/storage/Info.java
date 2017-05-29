@@ -10,7 +10,7 @@ public class Info extends BaseModel {
     @PrimaryKey
     public long id;
 
-    @Column(defaultValue = "1")
+    @Column(defaultValue = "0")
     public int status;
 
     public Info() {}
