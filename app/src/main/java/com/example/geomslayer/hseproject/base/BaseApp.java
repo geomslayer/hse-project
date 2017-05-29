@@ -9,6 +9,8 @@ import okhttp3.OkHttpClient;
 
 public class BaseApp extends Application {
 
+    public static String BASE_URL = "http://52.36.210.200/";
+
     private static OkHttpClient client;
 
     public static OkHttpClient getHttpClient() {

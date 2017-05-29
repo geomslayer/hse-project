@@ -13,4 +13,5 @@ public class Article {
     public String link;
     public String img;
     public int status;
+    public String hidden;
 }

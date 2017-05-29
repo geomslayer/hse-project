@@ -2,6 +2,7 @@ package com.example.geomslayer.hseproject.details;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,18 +12,26 @@ import android.widget.TextView;
 
 import com.example.geomslayer.hseproject.R;
 import com.example.geomslayer.hseproject.base.BaseActivity;
+import com.example.geomslayer.hseproject.base.BaseApp;
 import com.example.geomslayer.hseproject.networking.Article;
+import com.example.geomslayer.hseproject.networking.Question;
 import com.example.geomslayer.hseproject.stats.StatsManager;
-import com.example.geomslayer.hseproject.storage.Option;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
@@ -33,7 +42,6 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
 
     private StatsManager statsManager;
     private Article article;
-    private ArrayList<Option> options;
 
     @Override
     public int getLayoutResource() {
@@ -52,16 +60,7 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         article = new Gson().fromJson(zipArticle, Article.class);
         displayArticle();
 
-        Option opt1 = new Option();
-        opt1.isAnswer = true;
-        opt1.text = "Да! Отлично!";
-
-        Option opt2 = new Option();
-        opt2.isAnswer = false;
-        opt2.text = "Нет. Грустно...";
-
-        options = new ArrayList<>(Arrays.asList(opt1, opt2));
-        displayOptions();
+        requestQuestions(article.id);
     }
 
     @Override
@@ -92,10 +91,10 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         }
 
         // tmp:
-        ((TextView) findViewById(R.id.txt_question)).setText("Понравилась новость?");
+        ((TextView) findViewById(R.id.txt_question)).setText(getString(R.string.question));
     }
 
-    private void displayOptions() {
+    private void displayOptions(ArrayList<Question> options) {
         if (options == null) {
             return;
         }
@@ -103,13 +102,38 @@ public class ReadActivity extends BaseActivity implements View.OnClickListener {
         LinearLayout layoutOptions = (LinearLayout) findViewById(R.id.option_list);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        for (Option option : options) {
+        for (Question option : options) {
             Button optionBtn = new Button(this);
-            optionBtn.setTag(option.isAnswer);
+            optionBtn.setTag(option.is_ans);
             optionBtn.setText(option.text);
             optionBtn.setOnClickListener(this);
             layoutOptions.addView(optionBtn, layoutParams);
         }
+    }
+
+    private void requestQuestions(long newsId) {
+        Request request = new Request.Builder()
+                .url(BaseApp.BASE_URL + "questions/" + newsId)
+                .build();
+        BaseApp.getHttpClient().newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure: couldn't load questions.");
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Type type = new TypeToken<ArrayList<Question>>() {}.getType();
+                final ArrayList<Question> qs = new Gson().fromJson(response.body().string(), type);
+                ReadActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        displayOptions(qs);
+                    }
+                });
+            }
+        });
     }
 
     @Override

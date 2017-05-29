@@ -1,16 +1,14 @@
 <resources>
     <string name="app_name">HseProject</string>
-    <string name="read_news">Read news</string>
-    <string name="open_stats">Open stats</string>
-    <string name="right">You are right :)</string>
-    <string name="wrong">You are wrong :(</string>
-    <string name="settings">Settings</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="statistics">Statistics</string>
-    <string name="all_read">All news read</string>
-    <string name="all_answered">All questions answered</string>
-    <string name="answered_right">Answered right</string>
-    <string name="favorit_topic">Favorit topic</string>
+    <string name="read_news">Читать новости</string>
+    <string name="open_stats">Открыть статистику</string>
+    <string name="right">Верно :)</string>
+    <string name="wrong">Неверно :(</string>
+    <string name="settings">Настройки</string>
+    <string name="statistics">Статистика</string>
+    <string name="all_read">Новостей прочитано</string>
+    <string name="all_answered">Вопросов отвечено</string>
+    <string name="answered_right">Отвечено правильно</string>
+    <string name="favorit_topic">Любимая категория</string>
+    <string name="question">Какая деталь была пропущена?</string>
 </resources>
