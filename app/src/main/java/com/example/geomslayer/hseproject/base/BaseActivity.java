@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.geomslayer.hseproject.R;
-import com.example.geomslayer.hseproject.settings.SettingsActivity;
 import com.example.geomslayer.hseproject.stats.StatsActivity;
 
 abstract public class BaseActivity extends AppCompatActivity {
@@ -36,10 +35,7 @@ abstract public class BaseActivity extends AppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return true;
+
             case R.id.statistics:
                 Intent statisticsIntent = new Intent(this, StatsActivity.class);
                 startActivity(statisticsIntent);

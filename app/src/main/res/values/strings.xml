@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HseProject</string>
+    <string name="app_name">HSE Новости</string>
     <string name="read_news">Читать новости</string>
     <string name="open_stats">Открыть статистику</string>
     <string name="right">Верно :)</string>
