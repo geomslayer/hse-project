@@ -30,7 +30,8 @@
 
 Для нахождения похожих слов были использована готовая модель нейронной сети с
 [rusvectores.org](http://rusvectores.org/ru/). Для работы с моделями использовалась
-библиотека [gensim](https://radimrehurek.com/gensim/).
+библиотека [gensim](https://radimrehurek.com/gensim/). Для подготовки слов к обработке
+была использована библиотека `Pymorphy2`.
 
 Напомню, что код серверной части находится в [соседнем репозитории](https://github.com/geomslayer/hse-project-server).
 
