@@ -45,4 +45,31 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"/>
 
+    <LinearLayout
+        android:id="@+id/no_connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/rv_news"
+        app:layout_constraintLeft_toLeftOf="@+id/rv_news"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rv_news">
+
+        <ImageView
+            android:id="@+id/no_connection_img"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            app:srcCompat="@drawable/ic_connection"/>
+
+        <TextView
+            android:id="@+id/no_connection_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_connection"
+            android:textColor="@color/colorGrey"/>
+
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

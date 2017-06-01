@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity {
     private LinearLayoutManager layoutManager;
     private StatsManager statsManager;
     private boolean canLoad = false;
+    private ViewGroup placeholder;
 
     @Override
     public int getLayoutResource() {
@@ -54,6 +55,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        placeholder = (ViewGroup) findViewById(R.id.no_connection);
 
         prepareView();
         loadTopics();
@@ -100,8 +103,12 @@ public class MainActivity extends BaseActivity {
         getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure: couldn't load categories.");
-                e.printStackTrace();
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setPlaceholderVisibility(true);
+                    }
+                });
             }
 
             @Override
@@ -111,6 +118,7 @@ public class MainActivity extends BaseActivity {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        setPlaceholderVisibility(false);
                         spinnerTopics.setAdapter(new TopicAdapter(MainActivity.this, catsList));
                         long favCatId = statsManager.getPopularTopicId();
                         canLoad = true;
@@ -151,8 +159,12 @@ public class MainActivity extends BaseActivity {
         getHttpClient().newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure: couldn't load news.");
-                e.printStackTrace();
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setPlaceholderVisibility(true);
+                    }
+                });
             }
 
             @Override
@@ -188,6 +200,7 @@ public class MainActivity extends BaseActivity {
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        setPlaceholderVisibility(false);
                         rvNews.setAdapter(adapter);
                         rvNews.setLayoutManager(getLayoutManager());
                         rvNews.addOnScrollListener(scrollListener);
@@ -210,9 +223,7 @@ public class MainActivity extends BaseActivity {
                     .build();
             getHttpClient().newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException e) {
-
-                }
+                public void onFailure(Call call, IOException e) {}
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
@@ -228,6 +239,7 @@ public class MainActivity extends BaseActivity {
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                setPlaceholderVisibility(false);
                                 rvNews.getAdapter().notifyItemRangeInserted(
                                         totalItemsCount, newArticles.size());
                             }
@@ -237,5 +249,9 @@ public class MainActivity extends BaseActivity {
             });
         }
     };
+
+    private void setPlaceholderVisibility(boolean visible) {
+        placeholder.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
 }
